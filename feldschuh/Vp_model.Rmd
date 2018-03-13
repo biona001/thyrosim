@@ -1,0 +1,114 @@
+---
+title: "Week 4 progress report for upgrading thyrosim"
+author: "benjamin chu"
+date: "4/25/2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+##Feldschuh's paper
+
+Two weeks ago we realized that steady state concentrations of T3/T4 in skinny patients are way too high. This is rather strange because our model works for normal and obese patients. After some literature search, we realized that Nadler's paper[1] which first proposed the formula we used to predict blood volume did not include raw data. Therefore, we hypothesize that perhaps Nadler's data does not contain enough skinny patients, so the formula they proposed were poorly extrapolated for this kind of patients. 
+
+To test whether our model is predicting the correct blood volume for skinny patients, we found real data published by Feldschuh[2]. They have enough data for patients of all sizes, but was not available in a downloadable format. So we used an online tool called WebPlotDigitizer, which can extract data from figures. In addition, Feldschuh's model is based on deviation from ideal weight, which we obtained through the online tool too. 
+
+##Extracting the ideal weight model. 
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+male <- read.csv("feldschuh-male-idealweight.csv")
+female <- read.csv("feldschuh-female-idealweight.csv")
+
+height1 <- male$h
+height2 <- height1^2
+quadratic1.model <- lm(male$w ~ height1 + height2)
+summary(quadratic1.model)
+
+h1 <- female$h
+h2 <- h1^2
+quadratic2.model <- lm(female$w ~ h1 + h2)
+summary(quadratic2.model)
+```
+
+For both linear regressions, we have a multiple r-squared of 0.9998 and 0.9999 for males and females, indicating that our model is very accurate. We also fitted a cubic equation, but there was basically no difference. 
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+height_values_male <- seq(130, 200, 1)
+predicted_weight_male <- predict(quadratic1.model,list(height1=height_values_male, height2=height_values_male^2))
+
+height_values_female <- seq(130, 200, 1)
+predicted_weight_female <- predict(quadratic2.model,list(h1=height_values_female, h2=height_values_female^2))
+
+plot(male, main="Ideal body weight curve, blue = male, red = female", xlab="height (cm)", ylab="weight (kg)", xlim=c(140, 200), ylim=c(40, 100))
+lines(height_values_male, predicted_weight_male, col = "blue", lwd = 3)
+
+par(new=TRUE) #plots second graph on top of first
+plot(female, xlab="height (cm)", ylab="weight (kg)", xlim=c(140, 200), ylim=c(40, 100))
+lines(height_values_female, predicted_weight_female, col = "red", lwd = 3)
+
+```
+
+Let $IW$ denote the ideal weight equation. We establish that the two ideal-weight formula used in Feldschuh's paper is the following:
+$$IW_{male} = 200.3 - 2.557 h + 0.01064 h^2.$$
+$$IW_{female} = 150.4 - 1.938 h + 0.008504h^2$$
+$$\text{multiple r-squared} = 0.9998 \text{ and } 0.9999$$
+
+##Model for Feldschuh's patients
+
+```{r}
+patient <- read.csv("patient_data.csv")
+div <- patient$div
+div2 <- div^2
+div3 <- div^3
+div4 <- div^4
+
+cubic.model <- lm(patient$bv ~ div + div2 + div3) #cubic curve
+summary(cubic.model)
+
+four.model <- lm(patient$bv ~ div+div2+div3+div4)
+summary(four.model)
+
+exponential.model <- lm(log(patient$bv) ~ div)
+summary(exponential.model)
+```
+
+```{r}
+deviation_values <- seq(-50, 220, 1)
+predicted_bv_cube <- predict(cubic.model,list(div=deviation_values, div2=deviation_values^2, div3=deviation_values^3))
+
+predicted_bv_four <- predict(four.model, list(div=deviation_values,div2=deviation_values^2, div3=deviation_values^3, div4=deviation_values^4))
+bv.exponential2 <- exp(predict(exponential.model,list(div=deviation_values)))
+
+plot(patient, main="green = cubic, red = 4th order, blue=exp", xlab="Deviation from ideal weight (%)", ylab="Blood volume (ml/kg)")
+lines(deviation_values, predicted_bv_cube, col = "green", lwd = 3)
+lines(deviation_values, predicted_bv_four, col = "red", lwd = 3)
+lines(deviation_values, bv.exponential2, lwd=3, col = "blue")
+```
+
+
+Here we chose a cubic polynomial to approximate the dataset, because Nadler's formula[1] was also a cubic function. On the other hand, there's no reason to stop there, so we fitted a 4th, 5th, ..., 9th order polynomial too. Turns out that increasing the order beyond 4 worsens the fit, but 4th order is clearly better than 3rd order. We arrive at the following formula:
+$$BV_{cubic} = 70.26 - 0.5212 d + 0.003941 d^2 - 0.000009873 d^3$$
+$$BV_{quartic} = 69.74 - 0.5167d + 0.0004706d^2 - 0.00002111d^3 + 0.0000000386d^4$$
+$$\text{multiple r-squared} = 0.8786 \text{ and } 0.8797$$
+
+What if we looked at male and female's patient data separately?
+
+```{r}
+female_patient <- read.csv("patient_data_female.csv")
+di <- female_patient$div
+di2 <- di^2
+di3 <- di^3
+
+female.model <- lm(female_patient$bv ~ di+di2+di3)
+summary(female.model)
+
+predicted_bv_fem <- predict(female.model, list(di=deviation_values,di2=deviation_values^2, di3=deviation_values^3))
+bv.expon2 <- exp(predict(expon.model,list(di=deviation_values)))
+
+plot(female_patient, main="female data only", xlab="Deviation from ideal weight (%)", ylab="Blood volume (ml/kg)")
+lines(deviation_values, predicted_bv_fem, col = "red", lwd = 3)
+```
+
+
+##References
+1. Nadler, Samuel B., John U. Hidalgo, and Tedx Bloch. "Prediction of blood volume in normal human adults." Surgery Vol 51 Issue 2, (1962), pg 224 ~ 232.
+2. Feldschuh J, Enson Y. Prediction of the normal blood volume. Relation of blood volume to body habitus. Circulation. 1977 Oct;56(4 Pt 1):605-12.

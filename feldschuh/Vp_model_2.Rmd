@@ -1,0 +1,126 @@
+---
+title: "Week 5 progress report for upgrading thyrosim"
+author: "benjamin chu"
+date: "5/3/2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+##Refitting ideal weight curve
+Last week we obtained the fitted ideal weight formula and the regression data. Our ideal weight formula predicts that a 170cm male should have an ideal weight of 73.1 kg, but from Feldschuh's paper, 73.1kg seems to be overestimating a little bit (should be around 72). Since clicking is prone to manual error, I re-clicked the ideal weight data from Feldschuh's graph again to ensure our results are accurate. 
+
+Last week's ideal weight formula:
+$$IW_{male} = 200.3 - 2.557 h + 0.01064 h^2.$$
+$$IW_{female} = 150.4 - 1.938 h + 0.008504h^2$$
+
+This week, I obtained the not-so-similar ideal weight formula:
+$$IW_{male} = 176.3 - 2.206 h + 0.00935 h^2.$$
+$$IW_{female} = 145.8 - 1.827 h + 0.007955 h^2$$
+This new ideal weight formula predicts that the 70kg male have an ideal weight of 71.5kg, which is slightly more accurate.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+male <- read.csv("feldschuh-male-idealweight2.csv")
+female <- read.csv("feldschuh-female-idealweight2.csv")
+
+height1 <- male$h
+height2 <- height1^2
+quadratic1.model <- lm(male$w ~ height1 + height2)
+
+h1 <- female$h
+h2 <- h1^2
+quadratic2.model <- lm(female$w ~ h1 + h2)
+
+height_values_male <- seq(130, 200, 1)
+predicted_weight_male <- predict(quadratic1.model,list(height1=height_values_male, height2=height_values_male^2))
+
+height_values_female <- seq(130, 200, 1)
+predicted_weight_female <- predict(quadratic2.model,list(h1=height_values_female, h2=height_values_female^2))
+
+plot(male, main="Ideal body weight curve, blue = male, red = female", xlab="height (cm)", ylab="weight (kg)", xlim=c(140, 200), ylim=c(40, 100))
+lines(height_values_male, predicted_weight_male, col = "blue", lwd = 3)
+
+par(new=TRUE) #plots second graph on top of first
+plot(female, xlab="height (cm)", ylab="weight (kg)", xlim=c(140, 200), ylim=c(40, 100))
+lines(height_values_female, predicted_weight_female, col = "red", lwd = 3)
+```
+
+## Fitting monotonic function 
+
+Another problem with the regression fit we had last week was that the fitted curves were not monotonic. Contrary to physical intuition, the blood volume per kg for very fat people actually starts to increase. So, we tried to fit a monotonic curve this week. The result is as follows.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(mgcv)
+patient <- read.csv("patient_data.csv")
+df <- data.frame(x=patient$div, y=patient$bv)
+
+## Set up the size of the basis functions/number of knots
+k <- 5
+## This fits the unconstrained model but gets us smoothness parameters that
+## that we will need later
+unc <- gam(y ~ s(x, k = k, bs = "cr"), data = df)
+
+## This creates the cubic spline basis functions of `x`
+## It returns an object containing the penalty matrix for the spline
+## among other things; see ?smooth.construct for description of each
+## element in the returned object
+sm <- smoothCon(s(x, k = k, bs = "cr"), df, knots = NULL)[[1]]
+
+## This gets the constraint matrix and constraint vector that imposes
+## linear constraints to enforce montonicity on a cubic regression spline
+## the key thing you need to change is `up`.
+## `up = TRUE` == increasing function
+## `up = FALSE` == decreasing function (as per your example)
+## `xp` is a vector of knot locations that we get back from smoothCon
+F <- mono.con(sm$xp, up = FALSE)   # get constraints: up = FALSE == Decreasing constraint!
+
+## Fill in G, the object pcsl needs to fit; this is just what `pcls` says it needs:
+## X is the model matrix (of the basis functions)
+## C is the identifiability constraints - no constraints needed here
+##   for the single smooth
+## sp are the smoothness parameters from the unconstrained GAM
+## p/xp are the knot locations again, but negated for a decreasing function
+## y is the response data
+## w are weights and this is fancy code for a vector of 1s of length(y)
+G <- list(X = sm$X, C = matrix(0,0,0), sp = unc$sp,
+          p = -sm$xp, # note the - here! This is for decreasing fits!
+      y = df$y,
+          w = df$y*0+1)
+G$Ain <- F$A    # the monotonicity constraint matrix
+G$bin <- F$b    # the monotonicity constraint vector, both from mono.con
+G$S <- sm$S     # the penalty matrix for the cubic spline
+G$off <- 0      # location of offsets in the penalty matrix
+
+## Do the constrained fit 
+p <- pcls(G)  # fit spline (using s.p. from unconstrained fit)
+
+## predict at 100 locations over range of x - get a smooth line on the plot
+newx <- with(df, data.frame(x = seq(-50, 220, length = 100)))
+
+fv <- Predict.matrix(sm, newx) %*% p
+newx <- transform(newx, yhat = fv[,1])
+
+plot(y ~ x, data = df, main="Monotonic curve",xlab="deviation from ideal weight (%)", ylab="blood volume per kg (ml)")
+lines(yhat ~ x, data = newx, col = "red")
+```
+
+## How to get the red curve?
+Unfortunately, the code for fitting the curve above was copied from a forum, and the solution is very convoluted. We couldn't directly obtain the fitted curve. However, the general idea is that data are transformed into a monotonic table, which I have access to, and I could fit a polynomial to this data. While this introduces a second layer of potential bias, it is probably alright.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+x_axis1 <- newx$x
+x_axis2 <- x_axis1^2
+x_axis3 <- x_axis1^3
+x_axis4 <- x_axis1^4
+
+mymodel.model <- lm(newx$yhat ~ x_axis1 + x_axis2 + x_axis3 + x_axis4)
+
+test <- seq(-50, 220, 1)
+predicted <- predict(mymodel.model,list(x_axis1=test, x_axis2=test^2, x_axis3=test^3, x_axis4=test^4))
+
+plot(newx, main="Monotonic curve", xlab="deviation from ideal weight (%)", ylab="blood volume per kg (ml)", xlim=c(-50, 200), ylim=c(40, 120))
+lines(test, predicted, col = "blue", lwd = 3)
+```
+
+The equation (after a second layer of bias) is as follows:
+$$BV = 70.03 - 0.491d + 0.003854 d^2 - 0.000001379 d^3 + 0.00000001794d^4$$
