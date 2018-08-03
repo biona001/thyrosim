@@ -78,7 +78,7 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
 %ic measured in same units as q, which probably is micromol?
 
 % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
-dial = [0, 0.88, 0, 0.88];
+dial = [0.0, 0.88, 0.0, 0.88];
 
 % calling this function to get the p values to get correct initial
 % conditions in q2, q3, q5, q6
@@ -87,7 +87,7 @@ dial = [0, 0.88, 0, 0.88];
 %new initial conditions by solving quasi steady state
 q1 = T4_init*Vp_new/777;
 q4 = T3_init*Vp_new/651;
-q7 = Tsh_init*5.2/5.6;
+q7 = Tsh_init*Vtsh_new/5.6;
 FT3p = (p(24)+p(25)*q1+p(26)*q1^2+p(27)*q1^3)*q4;
 FT4p = (p(7)+p(8)*q1+p(9)*q1^2+p(10)*q1^3)*q1;
 

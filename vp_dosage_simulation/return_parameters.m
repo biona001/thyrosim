@@ -11,8 +11,8 @@ p(3) = 0.868;           %k12
 p(4) = 0.108;           %k13
 p(5) = 584;             %k31free
 p(6) = 1503;            %k21free
-p(7) = 0.000289;        %A
-p(8) = 0.000214;        %B
+p(7) = 0.000289;        %A originally 0.000289
+p(8) = 0.000214;        %B originally 0.000214
 p(9) = 0.000128;        %C
 p(10) = -8.83*10^-6;    %D
 p(11) = 0.498286;           %k4absorb; assuming scales the same as T3
@@ -41,16 +41,16 @@ p(33) = -3.71;          %phi
 p(34) = 0.53;           %kdegTSH-HYPO
 p(35) = 0.037;          %VmaxTSH
 p(36) = 23;             %K50TSH
-p(37) = 0.118;          %k3
+p(37) = 0.118; %* 1.4;          %k3
 p(38) = 0.29;           %T4P-EU
 p(39) = 0.006;          %T3P-EU
 p(40) = 0.037;          %KdegT3B
 p(41) = 0.0034;         %KLAG-HYPO
 p(42) = 5;              %KLAG
-p(43) = 8.98913;            %k4dissolve; assuming T4 dissolve scales the same as T3 dissolve (note this is not the case in the original thyrosim)
-p(44) = 0.06655*d(2);      %k4excrete; assuming T4 excrete scales the same as T3
-p(45) = 8.98913;           %k3dissolve, originally 1.78
-p(46) = 0.06655*d(4);      %k3excrete; originally 0.12 * d(4)
+p(43) = 8.9891 * 1.3/1.78;            %k4dissolve; originally 1.3 (scaled by original ratio)
+p(44) = 0.6655*d(4) ;                     %k4excrete; assuming T4 excrete scales the same as T3
+p(45) = 8.9891;                     %k3dissolve, originally 1.78
+p(46) = 0.6655*d(4);               %k3excrete; originally 0.12 * d(4)
 % p47 and p48 are only used in converting mols to units. Since unit conversion
 % is done in THYSIM->postProcess(), make sure you change p47 and p48 there if
 % you need to change these values.

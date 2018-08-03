@@ -1,23 +1,25 @@
 function f = simulate()
-    patient = [1.7 70.0 1]; %height (m), weight(kg), and sex (male = 1)
-    T4_init = 72.0;
-    T3_init = 0.978;
+    patient = [1.66 61.0 1]; %height (m), weight(kg), and sex (male = 1)
+    T4_init = 70.0;
+    T3_init = 4.0;
     Tsh_init = 2.42;
     t_unit = 'hours'; %currently not used
     
     %simulation length
     tspan = [0, 24]; %how often are doses given
-    repeat = 60;
+    repeat = 100;
 
     %get dosages based on various formulas
     addpath('../dosage_models')
     %T4dose = cunningham(patient(2), patient(3), 30); %weight, sex, age
-    %T4dose = mandel(patient(2)); %weight
+    %T4dose = 2.0 * mandel(patient(2)); %weight
     %T4dose = ojomo(patient(1), patient(2)); %weight, height)
     %T4dose = mistry(patient(2), 30); %weight, age
-    T4dose = donna(patient(1), patient(2), 30); %height, weight, age
-    T3dose = 0.0; %0.046 = 30mcg 0.069 = 45mcg
-        
+    %T4dose = donna(patient(1), patient(2), 30); %height, weight, age
+    %T4dose = 0.257; %this is 200 micrograms of T4
+    T4dose = 0.0;
+    T3dose = 0.199; %0.046 = 30mcg 0.069 = 45mcg
+            
     %construct simulation parameters
     tspans = [];
     T4doses = [];
