@@ -210,7 +210,7 @@ set(gca,'fontsize',18)
 % TSH plot
 subplot(3,1,3);
 ylabel('TSH mU/L');
-ylim([0 13]);
+ylim([-5 10]);
 xlabel('Days');
 hline = refline(0,0.4); %slope, intercept
 hline2 = refline(0,4.0); %slope, intercept
