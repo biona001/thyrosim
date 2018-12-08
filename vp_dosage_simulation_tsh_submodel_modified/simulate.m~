@@ -1,8 +1,8 @@
 function f = simulate()
-    patient = [1.7 70.0 1]; %height (m), weight(kg), and sex (male = 1)
-    T4_init = 73.52;
-    T3_init = 1.264;
-    Tsh_init = 1.896;
+    patient = [1.7 70.0 0]; %height (m), weight(kg), and sex (male = 1)
+    T4_init = 70.0;
+    T3_init = 4.0;
+    Tsh_init = 2.42;
     t_unit = 'hours'; %currently not used
     
     %simulation length
@@ -32,19 +32,11 @@ function f = simulate()
         T3doses = [T3doses; T3dose];
     end
     %}
-   
-    %below are simulation parameters for blakesley data
-    tspans = [0, 24; 0, 24; 0, 24; 0, 24; 0, 24];
-    T4doses = [0; 0.772; 0.0; 0.0; 0.0]; %600 micrograms = 0.7722 micromoles
-    T3doses = [0.0; 0.0; 0.0; 0.0; 0.0];
+    T4_dose_blakesley = [0; 0.772; 0.0; 0.0; 0.0;]; %600 micrograms = 0.7722 micromoles
     
     %simulate and plot
     [t4_values, t3_values, tsh_values] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses);
-    
-    %overlay real data with plotted values
-    plot_blakesley();
-    
-    %f = 0.0; %this calculates the error, need data
+    f = 0.0; %this calculates the error, need data
 end
     
     

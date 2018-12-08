@@ -15,7 +15,7 @@ p(7) = 0.000289;        %A originally 0.000289
 p(8) = 0.000214;        %B originally 0.000214
 p(9) = 0.000128;        %C
 p(10) = -8.83*10^-6;    %D
-p(11) = 0.498286;           %k4absorb; assuming scales the same as T3
+p(11) = 0.88; %0.498286;           %k4absorb; assuming scales the same as T3, originally 0.88
 p(12) = 0.0189;         %k02
 p(13) = 0.00998996;     %VmaxD1fast
 p(14) = 2.85;           %KmD1fast
@@ -34,8 +34,8 @@ p(26) = 0.00061;        %c
 p(27) = -0.000505;      %d
 p(28) = 0.498286;           %k3absorb; originally 0.88
 p(29) = 0.207;          %k05
-p(30) = 1166/100;           %Bzero
-p(31) = 581/100;            %Azero
+p(30) = 1166/10;           %Bzero
+p(31) = 581/10;            %Azero
 p(32) = 2.37;               %Amax
 p(33) = -3.71;          %phi
 p(34) = 0.53;           %kdegTSH-HYPO
@@ -47,14 +47,18 @@ p(39) = 0.006;          %T3P-EU
 p(40) = 0.037;          %KdegT3B
 p(41) = 0.0034;         %KLAG-HYPO
 p(42) = 5;              %KLAG
-p(43) = 8.9891 * 1.3/1.78;            %k4dissolve; originally 1.3 (scaled by original ratio)
+p(43) = 1.3; %8.9891 * 1.3/1.78;            %k4dissolve; originally 1.3 (scaled by original ratio)
 p(44) = 0.6655*d(4) ;                     %k4excrete; assuming T4 excrete scales the same as T3
-p(45) = 8.9891;                     %k3dissolve, originally 1.78
+p(45) = 1.78; %8.9891;                     %k3dissolve, originally 1.78
 p(46) = 0.6655*d(4);               %k3excrete; originally 0.12 * d(4)
 % p47 and p48 are only used in converting mols to units. Since unit conversion
 % is done in THYSIM->postProcess(), make sure you change p47 and p48 there if
 % you need to change these values.
 p(47) = 3.2;            %Vp
 p(48) = 5.2;            %VTSH
-p(55) = 70;             %thyrosim average patient weight (i.e. 70 orignally)
+%below are parameters we added for the hill function in f_circ, and SRtsh
+p(49) = 1.0;            %K_circ
+p(50) = 2.0;            %K_SR_tsh
+p(51) = 4;              %hill exponent in f_circ
+p(52) = 4;              %hill exponent in SR_tsh
 end
