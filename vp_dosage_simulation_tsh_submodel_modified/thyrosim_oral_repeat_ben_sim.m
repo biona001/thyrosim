@@ -38,15 +38,24 @@ t3_values = zeros(1, 17);% list of T3 values at start of each hour
 tsh_values = zeros(1, 17);% list of Tsh values at start of each hour
 
 % Run simulation for each defined run
-for i=1:length(tspans)
-    
+total_time = [];
+total_q = [];
+for i=1:length(tspans)    
     ic = updateIC(ic,T4doses(i),T3doses(i)); % Add drugs, if any
-    [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspans(i,:),patient); % Run simulation
+    phase = mod(t_last, 24); 
+    [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspans(i,:),patient,phase); % Run simulation
     ic = q(end,:); % Set this run's values as IC for next run
 
     % Graph results and update values for next run
+    %{
     t = t + t_last;
     graph(t,q);
+    t_last = t(end);
+    %}
+    
+    t = t + t_last;
+    total_time = [total_time; t(2:end)];
+    total_q = [total_q; q(2:end, :)];
     t_last = t(end);
     
     %record t4/t3/tsh at the end of each simulation segment
@@ -64,6 +73,7 @@ for i=1:length(tspans)
         TSHmax = max(q(:,7));
     end
 end
+graph(total_time,total_q);
 graphFin(T4max,T3max,TSHmax);
 
 [return_t4, return_t3, return_tsh] = t3_tsh_grabber(t,q, t4_values, t3_values, tsh_values);
@@ -125,6 +135,7 @@ end
 % Graph results
 function graph(t,q)
 global p
+
 % Conversion factors
 % 777: molecular weight of T4
 % 651: molecular weight of T3
@@ -156,20 +167,6 @@ plot(t,y2,'color','blue');
 subplot(3,1,3);
 hold on;
 plot(t,y3,'color','blue');
-
-%{
-disp('this is y1: ', length(y1));
-disp('this is y2: ', length(y2));
-disp('this is y3: ', length(y3));
-%}
-%{
-X = ['this is y1: ', num2str(length(y1))];
-Y = ['this is y2: ', num2str(length(y2))];
-Z = ['this is y3: ', num2str(length(y3))];
-disp(X);
-disp(Y);
-disp(Z);
-%}
 end
 
 function graphFin(T4max,T3max,TSHmax)

@@ -6,8 +6,8 @@ function f = simulate()
     t_unit = 'hours'; %currently not used
     
     %simulation length
-    tspan = [0, 24]; %how often are doses given
-    repeat = 5;
+    %tspan = [0, 24]; %how often are doses given
+    %repeat = 35;
 
     %get dosages based on various formulas
     addpath('../dosage_models')
@@ -31,18 +31,35 @@ function f = simulate()
         T4doses = [T4doses; T4dose];
         T3doses = [T3doses; T3dose];
     end
+    T4doses(15) = 0.772;
     %}
+    
+    %read blakesley data for parameter fitting
+    [time, my400_data, my450_data, my600_data] = parse_blakesley();
+    tspans = [];
+    for i=1:(length(time)-1)
+        %each row of tspans define a period of time in hours (e.g. [0, 24; 0, 24])
+        %tspans = [tspans; 0, time(i+1) - time(i)];
+        tspans = [tspans; 0, i];
+    end
+    %T4 drug dosage at beginning of 2nd day, and 0 T3 dose
+    T4doses = [0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;
+    0.772;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0]; %600 micrograms = 0.7722 micromoles
+    T3doses = [0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;
+    0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0];
    
     %below are simulation parameters for blakesley data
+    %{
     tspans = [0, 24; 0, 24; 0, 24; 0, 24; 0, 24];
     T4doses = [0; 0.772; 0.0; 0.0; 0.0]; %600 micrograms = 0.7722 micromoles
     T3doses = [0.0; 0.0; 0.0; 0.0; 0.0];
+    %}
     
     %simulate and plot
     [t4_values, t3_values, tsh_values] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses);
     
     %overlay real data with plotted values
-    plot_blakesley();
+    %plot_blakesley();
     
     %f = 0.0; %this calculates the error, need data
 end
