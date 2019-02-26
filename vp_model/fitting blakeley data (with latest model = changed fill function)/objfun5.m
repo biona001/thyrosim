@@ -1,5 +1,5 @@
 function f = objfun5(current_iter)
-    fitting_index = [45 28 30 31];
+    fitting_index = [31 50 51 52];
     
     if length(fitting_index) ~= length(current_iter)
         error('check vector length bro');
@@ -17,7 +17,7 @@ function f = objfun5(current_iter)
     end
     
     %patient parameters = height (m), weight(kg), and sex (male = 1)
-    patient_param = [1.7 70.0 1];
+    patient_param = [1.70 70.0 1]; %NEED THIS TO CHANGE TO 1.77M
     
     %initialize residual sum of squares
     f = 0.0;
@@ -39,13 +39,16 @@ function f = objfun5(current_iter)
         %simulate data and grab desired points. 
         [t4_values, t3_values, tsh_values] = thyrosim_oral_repeat_ben5(fitting_index,current_iter,tspans,patient_param,initial_condition,T4doses,T3doses);
         
-        %add to error
-        f = f + dot(cur_data(:,1), t4_values);
-        f = f + dot(cur_data(:,2), t3_values);
-        f = f + dot(cur_data(:,3), tsh_values);
+        %calculate residuals and add to f
+        r1 = cur_data(:,1) - t4_values;
+        r2 = cur_data(:,2) - t3_values;
+        r3 = cur_data(:,3) - tsh_values;
+        f = f + dot(r1, r1)/10000; %scale T4 data down to approxiate range
+        f = f + dot(r2, r2);
+        f = f + dot(r3, r3);
 
         %overlay real data with simulated values
-        %plot_blakesley(i);
+        plot_blakesley(i);
     end
 end
 
@@ -65,4 +68,9 @@ end
 
 
 
-%init = [1.78 0.498286 1166/10 581/10]
+% fitting only TSH -> no Amax
+%init = [581/10 2.0 4.0 4.0]
+%lower = [0 0 0 0]
+%upper = [1000 10 10 10]
+
+%result = [47.60971491706481	4.109957293739052	9.402862407833984	9.34704376566979]

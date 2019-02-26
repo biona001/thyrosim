@@ -38,10 +38,10 @@ function [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,fitting_index,current_it
         p(fitting_index(i)) = current_iter(i);
     end
 
-    % some patient parameters W, H, sex
+    % Scale Vp and Vtsh based on patient parameters W, H, sex
     [Vp_new, Vtsh_new, Vp_ratio] = patientParam5(patient, p(47), p(48));
-    p(47) = Vp_new; %reassign Vp after scaling
-    p(48) = Vtsh_new; %reassign Vtsh after scaling
+    p(47) = Vp_new;
+    p(48) = Vtsh_new;
     p(60) = phase;
 end
 
@@ -57,14 +57,14 @@ function dqdt = ODEs(t, q)
     SR4 = (p(1) *q(19))*d(1);                                       % Brain delay
     %fCIRC = 1+(p(32)/(p(31)*exp(-q(9)))-1)*(1/(1+exp(10*q(9)-55)));
     fCIRC = (p(32)+(p(31)-p(32))*q(9)^p(51)/(q(9)^p(51)+p(49)^p(51)))/p(31);
-    %SRTSH = (p(30)+p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)))*exp(-q(9));
+    %SRTSH = (p(30)+p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)))*exp(-q(9));    
     SRTSH = (p(30)+p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)))*(p(50)^p(52)/(p(50)^p(52) + q(9)^p(52)));
     %fdegTSH = p(34)+p(35)/(p(36)+q(7));
     fdegTSH = p(34)+(p(35)*q(7)/(p(36)+q(7)));
     fLAG = p(41)+2*q(8)^11/(p(42)^11+q(8)^11);
     f4 = p(37)+5*p(37)/(1+exp(2*q(8)-7));
     NL = p(13)/(p(14)+q(2));
-
+    
     % ODEs original
     qdot(1) = SR4+p(3)*q(2)+p(4)*q(3)-(p(5)+p(6))*q1F+p(11)*q(11)+u1;       %T4dot
     qdot(2) = p(6)*q1F-(p(3)+p(12)+NL)*q(2);                                %T4fast

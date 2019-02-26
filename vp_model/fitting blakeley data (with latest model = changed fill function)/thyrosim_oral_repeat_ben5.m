@@ -85,8 +85,8 @@ function [display_t4,display_t3,display_tsh] = thyrosim_oral_repeat_ben5(fitting
             TSHmax = max(q(:,7));
         end
     end
-    %graph(total_time,total_q);
-    %graphFin(T4max,T3max,TSHmax);
+    graph(total_time,total_q);
+    graphFin(T4max,T3max,TSHmax);
 
     %convert to appropriate units and return
     [display_t4, display_t3, display_tsh] = convert(return_t4_values, return_t3_values, return_tsh_values);
@@ -137,16 +137,19 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     FT3p = (p(24)+p(25)*q1+p(26)*q1^2+p(27)*q1^3)*q4;
     FT4p = (p(7)+p(8)*q1+p(9)*q1^2+p(10)*q1^3)*q1;
 
+    %ic(1) = 0.322114215761171;
     ic(1) = q1;
     %ic(2) = 0.201296960359917;
     ic(2) = (p(6)*FT4p) / (p(3)+p(12)+(p(13)/p(14))); 
     %ic(3) = 0.638967411907560;
     ic(3) = (p(5)*FT4p - p(17)) / (p(4) + (p(15)/p(16)));
+    %ic(4) = 0.00663104034826483;
     ic(4) = q4;
     %ic(5) = 0.0112595761822961;
     ic(5) = (p(23)*FT3p + (p(13)*ic(2))/(p(14)+ic(2))) / (p(20)+p(29));
     %ic(6) = 0.0652960640300348;
     ic(6) = (p(22)*FT3p + (p(15)*ic(3))/(p(16)+ic(3)) + (p(17)*ic(3))/(p(18)+ic(3))) / (p(21));
+    %ic(7) = 1.78829584764370;
     ic(7) = q7;
     ic(8) = 7.05727560072869;
     ic(9) = 7.05714474742141;
