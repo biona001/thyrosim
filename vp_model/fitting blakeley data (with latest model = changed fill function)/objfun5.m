@@ -17,7 +17,7 @@ function f = objfun5(current_iter)
     end
     
     %patient parameters = height (m), weight(kg), and sex (male = 1)
-    patient_param = [1.70 70.0 1]; %NEED THIS TO CHANGE TO 1.77M
+    patient_param = [1.77 70.0 1]; %NEED THIS TO CHANGE TO 1.77M
     
     %initialize residual sum of squares
     f = 0.0;

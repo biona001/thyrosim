@@ -85,6 +85,7 @@ function [display_t4,display_t3,display_tsh] = thyrosim_oral_repeat_ben5(fitting
             TSHmax = max(q(:,7));
         end
     end
+    disp(total_q(:, 4) ./ total_q(:, 8));
     graph(total_time,total_q);
     graphFin(T4max,T3max,TSHmax);
 
@@ -97,31 +98,6 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
 
     % some patient parameters W, H, sex
     [Vp_new, Vtsh_new, Vp_ratio] = patientParam5(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
-    %ic measured in same units as q, which probably is micromol?
-
-    %{
-    ic(1) = T4_init*Vp_new/777;
-    ic(2) = 0.201296960359917;
-    %ic(3) = 0.638967411907560 / SM_ratio;
-    ic(3) = 0.638967411907560;
-    ic(4) = T3_init*Vp_new/651;
-    ic(5) = 0.0112595761822961;
-    %ic(6) = 0.0652960640300348 / SM_ratio;
-    ic(6) = 0.0652960640300348;
-    ic(7) = Tsh_init*Vtsh_new/5.6; %should this be Vtsh or Vp
-    ic(8) = 7.05727560072869;
-    ic(9) = 7.05714474742141;
-    ic(10) = 0;
-    ic(11) = 0;
-    ic(12) = 0;
-    ic(13) = 0;
-    ic(14) = 3.34289716182018;
-    ic(15) = 3.69277248068433;
-    ic(16) = 3.87942133769244;
-    ic(17) = 3.90061903207543;
-    ic(18) = 3.77875734283571;
-    ic(19) = 3.55364471589659;
-    %}
 
     % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
     dial = [1.0, 0.88, 1.0, 0.88];
@@ -137,19 +113,12 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     FT3p = (p(24)+p(25)*q1+p(26)*q1^2+p(27)*q1^3)*q4;
     FT4p = (p(7)+p(8)*q1+p(9)*q1^2+p(10)*q1^3)*q1;
 
-    %ic(1) = 0.322114215761171;
     ic(1) = q1;
-    %ic(2) = 0.201296960359917;
     ic(2) = (p(6)*FT4p) / (p(3)+p(12)+(p(13)/p(14))); 
-    %ic(3) = 0.638967411907560;
     ic(3) = (p(5)*FT4p - p(17)) / (p(4) + (p(15)/p(16)));
-    %ic(4) = 0.00663104034826483;
     ic(4) = q4;
-    %ic(5) = 0.0112595761822961;
     ic(5) = (p(23)*FT3p + (p(13)*ic(2))/(p(14)+ic(2))) / (p(20)+p(29));
-    %ic(6) = 0.0652960640300348;
     ic(6) = (p(22)*FT3p + (p(15)*ic(3))/(p(16)+ic(3)) + (p(17)*ic(3))/(p(18)+ic(3))) / (p(21));
-    %ic(7) = 1.78829584764370;
     ic(7) = q7;
     ic(8) = 7.05727560072869;
     ic(9) = 7.05714474742141;
@@ -163,6 +132,29 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     ic(17) = 3.90061903207543;
     ic(18) = 3.77875734283571;
     ic(19) = 3.55364471589659;
+    
+    %initial condition from original thyrosim
+    %{
+    ic(1) = 0.322114215761171;
+    ic(2) = 0.201296960359917;
+    ic(3) = 0.638967411907560;
+    ic(4) = 0.00663104034826483;
+    ic(5) = 0.0112595761822961;
+    ic(6) = 0.0652960640300348;
+    ic(7) = 1.78829584764370;
+    ic(8) = 7.05727560072869;
+    ic(9) = 7.05714474742141;
+    ic(10) = 0;
+    ic(11) = 0;
+    ic(12) = 0;
+    ic(13) = 0;
+    ic(14) = 3.34289716182018;
+    ic(15) = 3.69277248068433;
+    ic(16) = 3.87942133769244;
+    ic(17) = 3.90061903207543;
+    ic(18) = 3.77875734283571;
+    ic(19) = 3.55364471589659;
+    %}
 end
 
 % Update initial conditions
@@ -434,7 +426,7 @@ function graphFin(T4max,T3max,TSHmax)
     % T4 plot
     subplot(3,1,1);
     ylabel('T4 mcg/L');
-    ylim([30 p1max*1.1]);
+    ylim([0 p1max*1.2]);
     hline = refline(0,45); %slope, intercept
     hline2 = refline(0,105); %slope, intercept
     hline.Color='g';
@@ -444,7 +436,7 @@ function graphFin(T4max,T3max,TSHmax)
     % T3 plot
     subplot(3,1,2);
     ylabel('T3 mcg/L');
-    ylim([0 2]);
+    ylim([0 1.2*p2max]);
     hline = refline(0,0.6); %slope, intercept
     hline2 = refline(0,1.8); %slope, intercept
     hline.Color='g';
@@ -455,7 +447,7 @@ function graphFin(T4max,T3max,TSHmax)
     % TSH plot
     subplot(3,1,3);
     ylabel('TSH mU/L');
-    ylim([0 p3max]);
+    ylim([0 1.2*p3max]);
     xlabel('Days');
     hline = refline(0,0.4); %slope, intercept
     hline2 = refline(0,4.0); %slope, intercept
