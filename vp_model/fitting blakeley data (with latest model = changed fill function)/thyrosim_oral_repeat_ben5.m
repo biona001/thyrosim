@@ -100,7 +100,7 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     [Vp_new, Vtsh_new, Vp_ratio] = patientParam5(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
 
     % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
-    dial = [1.0, 0.88, 1.0, 0.88];
+    dial = [0.1, 0.88, 0.1, 0.88];
 
     % calling this function to get the p values to get correct initial
     % conditions in q2, q3, q5, q6

@@ -34,7 +34,7 @@ function [p, d] = return_parameters(dial)
     p(27) = -0.000505;      %d
     p(28) = 0.498286;           %k3absorb; originally 0.88
     p(29) = 0.207;          %k05
-    p(30) = 100;           %Bzero -> this guy we will fix for now because for patient with 0 secretion and no treatment will result in TSH roughyly 150
+    p(30) = 2;           %Bzero -> this guy we will fix for now because for patient with 0 secretion and no treatment will result in TSH roughyly 150
     p(31) = 581/100;            %Azero
     p(32) = 0; %2.37;               %Amax -> this should be around 0 because 1976 weeke says hypothyroid patients should have no oscillations.
     p(33) = -3.71;          %phi
@@ -58,7 +58,7 @@ function [p, d] = return_parameters(dial)
     p(48) = 5.2;            %VTSH
     %below are parameters we added for the hill function in f_circ, and SRtsh
     p(49) = 2.5;            %K_circ -> this we are not going to fit because we don't have TSH data on very hypothyroid patients
-    p(50) = 3.0;            %K_SR_tsh
+    p(50) = 4.8;            %K_SR_tsh
     p(51) = 4;              %hill exponent in f_circ
     p(52) = 5.2;            %hill exponent in SR_tsh
 

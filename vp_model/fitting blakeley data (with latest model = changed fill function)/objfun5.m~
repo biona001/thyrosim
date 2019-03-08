@@ -1,5 +1,5 @@
 function f = objfun5(current_iter)
-    fitting_index = [31];
+    fitting_index = [31 50 51 52];
     
     if length(fitting_index) ~= length(current_iter)
         error('check vector length bro');
@@ -8,6 +8,7 @@ function f = objfun5(current_iter)
     %read blakesley data for parameter fitting
     [time, blakesley_data] = parse_blakesley();    
     doses = [0.515; 0.579; 0.7722]; %400/450/600 micrograms
+    doses
     
     %generate tspans
     num_sim = length(time)-1;
@@ -16,7 +17,7 @@ function f = objfun5(current_iter)
         %tspans(i, :) = [0 time(i+1)-time(i)]; %(e.g. [0, 24; 0, 24])
         tspans(i, :) = [0 24];
     end
-        
+    
     %patient parameters = height (m), weight(kg), and sex (male = 1)
     patient_param = [1.77 70.0 1]; %NEED THIS TO CHANGE TO 1.77M
     
@@ -31,8 +32,7 @@ function f = objfun5(current_iter)
         %T4 drug dosage at beginning of 2nd day (16th time point)
         T4doses = zeros(num_sim,1);
         T3doses = zeros(num_sim,1);
-        %T4doses(16) = doses(i);
-        %T4doses = 0.193*ones(num_sim,1);
+        T4doses(16) = doses(i);
 
         if length(T4doses) ~= length(tspans)
             error('hey hey check vector length again brah');
