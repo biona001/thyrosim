@@ -1,5 +1,5 @@
 function f = simulate()
-    patient = [1.77 70.0 1]; %height (m), weight(kg), and sex (male = 1)
+    patient = [1.7 70.0 1]; %height (m), weight(kg), and sex (male = 1)
     T4_init = 73.52;
     T3_init = 1.264;
     Tsh_init = 1.896;
@@ -7,7 +7,7 @@ function f = simulate()
     
     %simulation length
     tspan = [0, 24]; %how often are doses given
-    repeat = 5;
+    repeat = 100;
 
     %get dosages based on various formulas
     addpath('../dosage_models')
@@ -30,7 +30,7 @@ function f = simulate()
         T4doses = [T4doses; T4dose];
         T3doses = [T3doses; T3dose];
     end
-    T4doses(2) = 0.7722;
+    %T4doses(15) = 0.772;
     
     
     %read blakesley data for parameter fitting

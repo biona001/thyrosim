@@ -83,153 +83,161 @@ end
 % Initialize initial conditions and dial values
 function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
 
-% some patient parameters W, H, sex
-[Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
-%ic measured in same units as q, which probably is micromol?
+    % some patient parameters W, H, sex
+    [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
+    %ic measured in same units as q, which probably is micromol?
 
-% [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
-dial = [1.0, 0.88, 1.0, 0.88];
+    % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
+    dial = [1.0, 0.88, 1.0, 0.88];
 
-% calling this function to get the p values to get correct initial
-% conditions in q2, q3, q5, q6
-[p, d] = return_parameters(dial);
+    % calling this function to get the p values to get correct initial
+    % conditions in q2, q3, q5, q6
+    [p, d] = return_parameters(dial);
 
-%new initial conditions by solving quasi steady state
-q1 = T4_init*Vp_new/777;
-q4 = T3_init*Vp_new/651;
-q7 = Tsh_init*Vtsh_new/5.6;
-FT3p = (p(24)+p(25)*q1+p(26)*q1^2+p(27)*q1^3)*q4;
-FT4p = (p(7)+p(8)*q1+p(9)*q1^2+p(10)*q1^3)*q1;
+    %new initial conditions by solving quasi steady state
+    q1 = T4_init*Vp_new/777;
+    q4 = T3_init*Vp_new/651;
+    q7 = Tsh_init*Vtsh_new/5.6;
+    FT3p = (p(24)+p(25)*q1+p(26)*q1^2+p(27)*q1^3)*q4;
+    FT4p = (p(7)+p(8)*q1+p(9)*q1^2+p(10)*q1^3)*q1;
+    a_bd_c = p(6)*FT4p - (p(3)+p(12))*p(14) - p(13);
+    
+    %AA = p(4);
+    %BB = -p(5)*FT4p+p(4)*(p(16)+p(18))+p(15)+p(17);
+    %CC = -p(5)*FT4p*(p(16)+p(18))+p(4)*p(16)*p(18)+p(15)*p(18)+p(17)*p(16);
+    %DD = -p(5)*FT4p*p(16)*p(18);
+    %result = roots([AA BB CC DD]);
+    %q3 = result(result >= 0); %hope that this is just a single value for all cases
 
-ic(1) = q1;
-%ic(2) = 0.201296960359917;
-ic(2) = (p(6)*FT4p) / (p(3)+p(12)+(p(13)/p(14))); 
-%ic(3) = 0.638967411907560;
-ic(3) = (p(5)*FT4p - p(17)) / (p(4) + (p(15)/p(16)));
-ic(4) = q4;
-%ic(5) = 0.0112595761822961;
-ic(5) = (p(23)*FT3p + (p(13)*ic(2))/(p(14)+ic(2))) / (p(20)+p(29));
-%ic(6) = 0.0652960640300348;
-ic(6) = (p(22)*FT3p + (p(15)*ic(3))/(p(16)+ic(3)) + (p(17)*ic(3))/(p(18)+ic(3))) / (p(21));
-ic(7) = q7;
-ic(8) = 7.05727560072869;
-ic(9) = 7.05714474742141;
-ic(10) = 0;
-ic(11) = 0;
-ic(12) = 0;
-ic(13) = 0;
-ic(14) = 3.34289716182018;
-ic(15) = 3.69277248068433;
-ic(16) = 3.87942133769244;
-ic(17) = 3.90061903207543;
-ic(18) = 3.77875734283571;
-ic(19) = 3.55364471589659;
+    ic(1) = q1;
+    %ic(2) = (p(6)*FT4p) / (p(3)+p(12)+(p(13)/p(14))); %assuming Km21fast much greater than q2 in the denominator -> potentially bad approximation
+    ic(2) = (a_bd_c + sqrt(a_bd_c^2 + 4*(p(3)+p(12))*p(6)*FT4p*p(14))) / (2*(p(3)+p(12)));
+    ic(3) = (p(5)*FT4p - p(17)) / (p(4) + (p(15)/p(16)));
+    %ic(3) = q3;
+    ic(4) = q4;
+    ic(5) = (p(23)*FT3p + (p(13)*ic(2))/(p(14)+ic(2))) / (p(20)+p(29));
+    ic(6) = (p(22)*FT3p + (p(15)*ic(3))/(p(16)+ic(3)) + (p(17)*ic(3))/(p(18)+ic(3))) / (p(21));
+    ic(7) = q7;
+    ic(8) = 7.05727560072869;
+    ic(9) = 7.05714474742141;
+    %ic(8) = (p(37)*q1/p(38) + p(37)*q4/p(39)) / p(40); %IMPORTANT: this assumes T3B is very high, so f4 ~ k3 probably need to change for Jonklaas data
+    %ic(9) = ic(8);
+    ic(10) = 0;
+    ic(11) = 0;
+    ic(12) = 0;
+    ic(13) = 0;
+    ic(14) = 3.34289716182018;
+    ic(15) = 3.69277248068433;
+    ic(16) = 3.87942133769244;
+    ic(17) = 3.90061903207543;
+    ic(18) = 3.77875734283571;
+    ic(19) = 3.55364471589659;
 end
 
 % Update initial conditions
 function [ic] = updateIC(ic,T4dose,T3dose)
-ic(11) = ic(11) + T4dose;
-ic(13) = ic(13) + T3dose;
+    ic(11) = ic(11) + T4dose;
+    ic(13) = ic(13) + T3dose;
 end
 
 % Graph results
 function graph(t,q)
-global p
+    global p
 
-% Conversion factors
-% 777: molecular weight of T4
-% 651: molecular weight of T3
-% 5.6: (q7 umol)*(28000 mcg/umol)*(0.2 mU/mg)*(1 mg/1000 mcg)
-% where 28000 is TSH molecular weight and 0.2 is specific activity
-T4conv  = 777/p(47);    % mcg/L
-T3conv  = 651/p(47);    % mcg/L
-TSHconv = 5.6/p(48);    % mU/L
+    % Conversion factors
+    % 777: molecular weight of T4
+    % 651: molecular weight of T3
+    % 5.6: (q7 umol)*(28000 mcg/umol)*(0.2 mU/mg)*(1 mg/1000 mcg)
+    % where 28000 is TSH molecular weight and 0.2 is specific activity
+    T4conv  = 777/p(47);    % mcg/L
+    T3conv  = 651/p(47);    % mcg/L
+    TSHconv = 5.6/p(48);    % mU/L
 
-% Outputs
-y1 = q(:,1)*T4conv;     % T4
-y2 = q(:,4)*T3conv;     % T3
-y3 = q(:,7)*TSHconv;    % TSH
+    % Outputs
+    y1 = q(:,1)*T4conv;     % T4
+    y2 = q(:,4)*T3conv;     % T3
+    y3 = q(:,7)*TSHconv;    % TSH
 
-%simulation time
-t  = t/24;              % Convert time to days
+    %simulation time
+    t  = t/24;              % Convert time to days
 
-% T4 plot
-subplot(3,1,1);
-hold on;
-plot(t,y1,'color','blue');
+    % T4 plot
+    subplot(3,1,1);
+    hold on;
+    plot(t,y1,'color','blue');
 
-% T3 plot
-subplot(3,1,2);
-hold on;
-plot(t,y2,'color','blue');
+    % T3 plot
+    subplot(3,1,2);
+    hold on;
+    plot(t,y2,'color','blue');
 
-% TSH plot
-subplot(3,1,3);
-hold on;
-plot(t,y3,'color','blue');
+    % TSH plot
+    subplot(3,1,3);
+    hold on;
+    plot(t,y3,'color','blue');
 end
 
 function graphFin(T4max,T3max,TSHmax)
 
-global p
-T4conv  = 777/p(47);    % mcg/L
-T3conv  = 651/p(47);    % mcg/L
-TSHconv = 5.6/p(48);    % mU/L
+    global p
+    T4conv  = 777/p(47);    % mcg/L
+    T3conv  = 651/p(47);    % mcg/L
+    TSHconv = 5.6/p(48);    % mU/L
 
-% Outputs
-p1max = T4max*T4conv;     % T4
-p2max = T3max*T3conv;     % T3
-p3max = TSHmax*TSHconv;    % TSH
-
-
-% T4 plot
-subplot(3,1,1);
-ylabel('T4 mcg/L');
-ylim([0 120]);
-hline = refline(0,45); %slope, intercept
-hline2 = refline(0,105); %slope, intercept
-hline.Color='g';
-hline2.Color='g';
-set(gca,'fontsize',18)
+    % Outputs
+    p1max = T4max*T4conv;     % T4
+    p2max = T3max*T3conv;     % T3
+    p3max = TSHmax*TSHconv;    % TSH
 
 
-% T3 plot
-subplot(3,1,2);
-ylabel('T3 mcg/L');
-ylim([0 5]);
-hline = refline(0,0.6); %slope, intercept
-hline2 = refline(0,1.8); %slope, intercept
-hline.Color='g';
-hline2.Color='g';
-set(gca,'fontsize',18)
+    % T4 plot
+    subplot(3,1,1);
+    ylabel('T4 mcg/L');
+    ylim([0 120]);
+    hline = refline(0,45); %slope, intercept
+    hline2 = refline(0,105); %slope, intercept
+    hline.Color='g';
+    hline2.Color='g';
+    set(gca,'fontsize',18)
 
 
-% TSH plot
-subplot(3,1,3);
-ylabel('TSH mU/L');
-ylim([0 p3max]);
-xlabel('Days');
-hline = refline(0,0.4); %slope, intercept
-hline2 = refline(0,4.0); %slope, intercept
-hline.Color='g';
-hline2.Color='g';
-set(gca,'fontsize',18)
+    % T3 plot
+    subplot(3,1,2);
+    ylabel('T3 mcg/L');
+    ylim([0 5]);
+    hline = refline(0,0.6); %slope, intercept
+    hline2 = refline(0,1.8); %slope, intercept
+    hline.Color='g';
+    hline2.Color='g';
+    set(gca,'fontsize',18)
+
+
+    % TSH plot
+    subplot(3,1,3);
+    ylabel('TSH mU/L');
+    ylim([0 p3max]);
+    xlabel('Days');
+    hline = refline(0,0.4); %slope, intercept
+    hline2 = refline(0,4.0); %slope, intercept
+    hline.Color='g';
+    hline2.Color='g';
+    set(gca,'fontsize',18)
 end
 
 
 function [t4_values,t3_values,tsh_values] = t3_tsh_grabber(t,q,t4_values,t3_values,tsh_values)
-global p
+    global p
 
-T4conv  = 777/p(47);    % mcg/L
-T3conv  = 651/p(47);    % mcg/L
-TSHconv = 5.6/p(48);    % mU/L
+    T4conv  = 777/p(47);    % mcg/L
+    T3conv  = 651/p(47);    % mcg/L
+    TSHconv = 5.6/p(48);    % mU/L
 
-t4_values(17) = q(end,1);
-t4_values = t4_values*T4conv;
+    t4_values(17) = q(end,1);
+    t4_values = t4_values*T4conv;
 
-t3_values(17) = q(end,4);
-t3_values = t3_values*T3conv;
+    t3_values(17) = q(end,4);
+    t3_values = t3_values*T3conv;
 
-tsh_values(17) = q(end,7);
-tsh_values = tsh_values*TSHconv;
+    tsh_values(17) = q(end,7);
+    tsh_values = tsh_values*TSHconv;
 end
