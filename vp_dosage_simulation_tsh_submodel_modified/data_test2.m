@@ -155,7 +155,6 @@ function [patient_param, patient_t4, patient_t3, patient_tsh, t4_std, t3_std, ts
     patient_t3 = [patient_1_t3;patient_13_t3;patient_10_t3;patient_18_t3;patient_19_t3;patient_31_t3;patient_27_t3;patient_2_t3;patient_8_t3;patient_20_t3;patient_11_t3;patient_6_t3;patient_22_t3;patient_24_t3;patient_5_t3];
     patient_tsh = [patient_1_tsh;patient_13_tsh;patient_10_tsh;patient_18_tsh;patient_19_tsh;patient_31_tsh;patient_27_tsh;patient_2_tsh;patient_8_tsh;patient_20_tsh;patient_11_tsh;patient_6_tsh;patient_22_tsh;patient_24_tsh;patient_5_tsh];
     
-    
     %1 fat and 1 normal
     %{
     patient_param = [patient_20_param;patient_27_param];

@@ -1,4 +1,4 @@
-function [Vp_new, Vtsh_new, Vp_ratio] = patientParam4(input, p47, p48)
+function [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(input, p47, p48)
     %input = H, W, sex (1 = male)
     H = input(1);
     W = input(2);

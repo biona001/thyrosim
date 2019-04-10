@@ -21,7 +21,7 @@
 %-------------------------------------------------- 
 
 % Main - wrapper for oral doses
-function [return_t4,return_t3,return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses)
+function [total_time, total_q] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses)
 
 % Initialize
 [ic,dial] = init(patient, T4_init, T3_init, Tsh_init);
@@ -73,11 +73,10 @@ for i=1:length(tspans)
         TSHmax = max(q(:,7));
     end
 end
-graph(total_time,total_q);
-graphFin(T4max,T3max,TSHmax);
+%graph(total_time,total_q);
+%graphFin(T4max,T3max,TSHmax);
 
-[return_t4, return_t3, return_tsh] = t3_tsh_grabber(t,q, t4_values, t3_values, tsh_values);
-
+%[return_t4, return_t3, return_tsh] = t3_tsh_grabber(t,q, t4_values, t3_values, tsh_values);
 end
 
 % Initialize initial conditions and dial values
@@ -160,7 +159,7 @@ function graph(t,q)
 
     %simulation time
     t  = t/24;              % Convert time to days
-
+    
     % T4 plot
     subplot(3,1,1);
     hold on;
@@ -189,7 +188,6 @@ function graphFin(T4max,T3max,TSHmax)
     p2max = T3max*T3conv;     % T3
     p3max = TSHmax*TSHconv;    % TSH
 
-
     % T4 plot
     subplot(3,1,1);
     ylabel('T4 mcg/L');
@@ -200,7 +198,6 @@ function graphFin(T4max,T3max,TSHmax)
     hline2.Color='g';
     set(gca,'fontsize',18)
 
-
     % T3 plot
     subplot(3,1,2);
     ylabel('T3 mcg/L');
@@ -210,7 +207,6 @@ function graphFin(T4max,T3max,TSHmax)
     hline.Color='g';
     hline2.Color='g';
     set(gca,'fontsize',18)
-
 
     % TSH plot
     subplot(3,1,3);
@@ -223,7 +219,6 @@ function graphFin(T4max,T3max,TSHmax)
     hline2.Color='g';
     set(gca,'fontsize',18)
 end
-
 
 function [t4_values,t3_values,tsh_values] = t3_tsh_grabber(t,q,t4_values,t3_values,tsh_values)
     global p

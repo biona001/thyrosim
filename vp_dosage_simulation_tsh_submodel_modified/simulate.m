@@ -1,13 +1,13 @@
-function f = simulate()
-    patient = [1.77 70.0 1]; %height (m), weight(kg), and sex (male = 1)
-    T4_init = 73.52;
-    T3_init = 1.264;
-    Tsh_init = 1.896;
+function [total_time, total_q] = simulate(patient, T4_init, T3_init, Tsh_init, T3dose)
+    %patient = [1.831 94.7 1]; %height (m), weight(kg), and sex (male = 1)
+    %T4_init = 72;
+    %T3_init = 0.98;
+    %Tsh_init = 2.42;
     t_unit = 'hours'; %currently not used
     
     %simulation length
-    tspan = [0, 24]; %how often are doses given
-    repeat = 5;
+    tspan = [0,0.5]; %how often are doses given
+    repeat = 17;
 
     %get dosages based on various formulas
     addpath('../dosage_models')
@@ -17,21 +17,19 @@ function f = simulate()
     %T4dose = mistry(patient(2), 30); %weight, age
     %T4dose = donna(patient(1), patient(2), 30); %height, weight, age
     %T4dose = 0.257; %this is 200 micrograms of T4
+    %T3dose = 0.069; %0.046 = 30mcg 0.069 = 45mcg
+    %T3dose = 0.0;
     T4dose = 0.0;
-    %T3dose = 0.046; %0.046 = 30mcg 0.069 = 45mcg
-    T3dose = 0.0;
-    
+
     %construct simulation parameters
     tspans = [];
-    T4doses = [];
-    T3doses = [];
+    T4doses = zeros(repeat, 1);
+    T3doses = zeros(repeat, 1);
     for i=1:repeat
         tspans = [tspans; tspan];
-        T4doses = [T4doses; T4dose];
-        T3doses = [T3doses; T3dose];
     end
-    T4doses(2) = 0.7722;
-    
+    %T4doses(2) = 0.7722;
+    T3doses(1) = T3dose;
     
     %read blakesley data for parameter fitting
     %{
@@ -57,12 +55,10 @@ function f = simulate()
     %}
     
     %simulate and plot
-    [t4_values, t3_values, tsh_values] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses);
+    [total_time, total_q] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses);
     
     %overlay real data with plotted values
     %plot_blakesley();
-    
-    %f = 0.0; %this calculates the error, need data
 end
     
     
