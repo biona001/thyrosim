@@ -34,7 +34,7 @@ function [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase)
     [p, d] = return_parameters(dial);
 
     % some patient parameters W, H, sex
-    [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient, p(47), p(48));
+    [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient);
     p(47) = Vp_new; %reassign Vp after scaling
     p(48) = Vtsh_new; %reassign Vtsh after scaling
     p(60) = phase;

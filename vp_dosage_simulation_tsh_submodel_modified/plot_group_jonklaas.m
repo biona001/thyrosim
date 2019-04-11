@@ -1,10 +1,32 @@
-function plot_individual_patients_jonklaas()
+function plot_group_jonklaas()
+    plot_group = 'overweight45';
+    
     %specify time of dosage and import data
     patient_t = [0, 5/12/24, 1/24, 2/24, 3/24, 4/24, 5/24 ,6/24 ,7/24 ,8/24]; %days
     [patient_param, patient_t4, patient_t3, patient_tsh, t4_std, t3_std, tsh_std] = data_test2();
     dose = [0.046 0.046 0.069 0.069 0.046 0.046 0.069 0.046 0.046 0.046 0.069 0.069 0.069 0.069 0.046];
+    
+    if strcmp(plot_group, 'overweight30')
+        name = 'Overweight patients with 30 mcg T3 oral dose, 2 patients';
+        index = [10 15];        
+    elseif strcmp(plot_group, 'overweight45')
+        name = 'Overweight patients with 45 mcg T3 oral dose, 4 patients';
+        index = [11 12 13 14];
+    elseif strcmp(plot_group, 'normal45')
+        name = 'Normal weight patients with 45 mcg T3 oral dose, 3 patients';
+        index = [3 4 7];
+    elseif strcmp(plot_group, 'normal30')
+        name = 'Normal weight patients with 30 mcg T3 oral dose, 6 patients';
+        index = [1 2 5 6 8 9];
+    end
+    
+    %subset the data
+    patient_param = patient_param(index, :);
+    patient_t4 = patient_t4(index, :);
+    patient_t3 = patient_t3(index, :);
+    patient_tsh = patient_tsh(index, :);
         
-    for i=1:size(patient_t4, 1)
+    for i=1:size(index, 2)
         %simulate using thyrosim
         [total_time, total_q] = simulate(patient_param(i, 1:3), patient_t4(i, 1), patient_t3(i, 1), patient_tsh(i, 1), dose(i));
 
@@ -27,7 +49,6 @@ function plot_individual_patients_jonklaas()
         %plot real and simulation data
         myfig = subplot(3, 1, 1);
         hold on;
-        plot(patient_t, patient_t4(i,:),'black.','MarkerSize',20); %real data
         plot(t,y1,'color','black'); %simulation data
         ylabel('T4 mcg/L');
         ylim([0 1.5*p1max]);
@@ -42,13 +63,10 @@ function plot_individual_patients_jonklaas()
         else
             sex = 'female';
         end
-        name = ['Patient ', num2str(i), ' (', num2str(patient_param(i, 1)), ...
-            'm ', num2str(patient_param(i, 2)), 'kg ', ...
-            sex, ', ', num2str(round(dose(i)*651)), ' ug oral T3)'];
+
         title({name});
         subplot(3, 1, 2);
         hold on;
-        plot(patient_t, patient_t3(i,:),'red.','MarkerSize',20);
         plot(t,y2,'color','red');
         subplot(3,1,2);
         ylabel('T3 mcg/L');
@@ -61,7 +79,6 @@ function plot_individual_patients_jonklaas()
     
         subplot(3, 1, 3);
         hold on;
-        plot(patient_t, patient_tsh(i,:) ,'blue.','MarkerSize',20);
         plot(t,y3,'color','blue');
         subplot(3,1,3);
         ylabel('TSH mU/L');
@@ -75,7 +92,34 @@ function plot_individual_patients_jonklaas()
         
         %save plot and clear workspace
         %savefig(['./individual_plots/', num2str(i), '.fig'])
-        saveas(myfig, ['./individual_plots/', num2str(i), '.png'])
-        clf('reset')
+        %saveas(myfig, ['./individual_plots/', num2str(i), '.png'])
+        %clf('reset')
     end 
+
+    color='k';
+    Color='b';
+    
+    subplot(3, 1, 1);
+    hold on;
+    mean_t4 = mean(patient_t4);
+    t4_std = std(patient_t4);
+    plot(patient_t,mean_t4,color,'MarkerSize',20);
+    hold on;
+    errorbar(patient_t,mean_t4,t4_std,'LineWidth',2.0,'Color',Color)
+
+    subplot(3, 1, 2);
+    hold on;
+    mean_t3 = mean(patient_t3);
+    t3_std = std(patient_t3);
+    plot(patient_t,mean_t3,color,'MarkerSize',20);
+    hold on;
+    errorbar(patient_t,mean_t3,t3_std,'LineWidth',2.0,'Color',Color)
+
+    subplot(3, 1, 3);
+    hold on;
+    mean_tsh = mean(patient_tsh);
+    tsh_std = std(patient_tsh);
+    plot(patient_t,mean_tsh,color,'MarkerSize',20);
+    hold on;
+    errorbar(patient_t,mean_tsh,tsh_std,'LineWidth',2.0,'Color',Color)
 end

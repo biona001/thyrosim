@@ -83,11 +83,11 @@ end
 function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
 
     % some patient parameters W, H, sex
-    [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
+    [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient); %just used to calculated initial conditions, so use original Vp and Vtsh
     %ic measured in same units as q, which probably is micromol?
 
     % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
-    dial = [1.0, 0.88, 1.0, 0.88];
+    dial = [0.0, 0.88, 0.0, 0.88];
 
     % calling this function to get the p values to get correct initial
     % conditions in q2, q3, q5, q6

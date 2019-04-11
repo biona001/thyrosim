@@ -1,5 +1,7 @@
-function [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(input, p47, p48)
+function [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(input)
     %input = H, W, sex (1 = male)
+    p47 = 3.2; %original Vp
+    p48 = 5.2; %original TSH 
     H = input(1);
     W = input(2);
     sex = input(3);
@@ -24,16 +26,16 @@ function [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(input, p47, p48)
     Vb = Vb_per_kg * W / 1000; 
     
     %average male/female data in US
-    male_height = 1.77;
-    female_height = 1.63;
-    male_weight = 70.0;
-    female_weight = 59.0;
     male_ref_vp = 2.92;
     female_ref_vp = 2.48;
+    %male_height = 1.77; %these are parameter we used to get male_ref_vp
+    %female_height = 1.63;
+    %male_weight = 70.0;
+    %female_weight = 59.0;
     
-	Vp_new = Vb*(1-Hem);       % Vp (orginally 3.2)
        
     %scaling predicted plasma volumn up since feldschuch's data predicts 70 kg would give 2.7 L
+	Vp_new = Vb*(1-Hem);       % Vp (orginally 3.2)
     if sex == 1
         Vp_new = Vp_new * 3.2 / male_ref_vp;    
     else
@@ -50,5 +52,4 @@ function [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(input, p47, p48)
 	Vtsh_new = Vtsh_old + Vp_new - p47; 
     %Vtsh_new = 2.0 + Vp_new; 
 	Vp_ratio = p47 / Vp_new;      % ratio for plasma volume
-	return 
 end
