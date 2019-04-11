@@ -31,7 +31,7 @@ function [p, d] = return_parameters(dial)
     p(25) = 0.00185;        %b
     p(26) = 0.00061;        %c
     p(27) = -0.000505;      %d
-    p(28) = 0.498286;           %k3absorb; originally 0.88
+    p(28) = 0.88; %0.498286;           %k3absorb; originally 0.88
     p(29) = 0.207;          %k05
     p(30) = 100;              %Bzero -> this guy we will fix for now because for patient with 0 secretion and no treatment will result in TSH roughyly 150
     p(31) = 49.39;            %Azero -> fitted to blakesley data
@@ -48,8 +48,8 @@ function [p, d] = return_parameters(dial)
     p(42) = 5;              %KLAG
     p(43) = 1.3;            %k4dissolve; originally 1.3 (scaled by original ratio)
     p(44) = 0.12*d(2);      %k4excrete; assuming T4 excrete scales the same as T3
-    p(45) = 8.9891;                    %k3dissolve, originally 1.78 -> should redo these with jonklass data since we changed TSH brain submodel
-    p(46) = 0.6655*d(4);               %k3excrete; originally 0.12 * d(4)
+    p(45) = 1.78; %8.9891;                    %k3dissolve, originally 1.78 -> should redo these with jonklass data since we changed TSH brain submodel
+    p(46) = 0.12 * d(4); %0.6655*d(4);               %k3excrete; originally 0.12 * d(4)
     % p47 and p48 are only used in converting mols to units. Since unit conversion
     % is done in THYSIM->postProcess(), make sure you change p47 and p48 there if
     % you need to change these values.
