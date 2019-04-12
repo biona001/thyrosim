@@ -1,4 +1,4 @@
-function [total_time, total_q] = simulate(patient, T4data, T3data, TSHdata, T3dose)
+function [total_time, total_q] = simulate(patient, T4data, T3data, TSHdata, T3dose, fitting_index, fitted_result)
     %patient = [1.831 94.7 1]; %height (m), weight(kg), and sex (male = 1)
     T4_init = T4data(1);
     T3_init = T3data(1);
@@ -55,7 +55,7 @@ function [total_time, total_q] = simulate(patient, T4data, T3data, TSHdata, T3do
     %}
     
     %simulate and plot
-    [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses, [], []);
+    [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses, fitting_index, fitted_result);
     
     %overlay real data with plotted values
     %plot_blakesley();

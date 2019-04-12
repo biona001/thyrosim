@@ -14,7 +14,7 @@ function [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspan,patient,phase,fit
     % Initialize
     global u1 u4 kdelay d p;
     [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase,fitting_index,current_iter);
-
+    
     % Solve ODE
     [t,q] = ode45(@ODEs, tspan, ic);
     %[t,q] = ode45(@ODEs_old, tspan, ic);

@@ -1,5 +1,5 @@
 function plot_group_jonklaas()
-    plot_group = 'overweight30';
+    plot_group = 'normal30';
     
     %specify time of dosage and import data
     patient_t = [0, 5/12/24, 1/24, 2/24, 3/24, 4/24, 5/24 ,6/24 ,7/24 ,8/24]; %days
@@ -29,7 +29,9 @@ function plot_group_jonklaas()
 
     for i=1:size(index, 2)
         %simulate using thyrosim
-        [total_time, total_q] = simulate(patient_param(i, 1:3), patient_t4(i, :), patient_t3(i, :), patient_tsh(i, :), dose(i));
+        fitting_index = [28 45 46];
+        fitted_result = [0.46559884538558116	1.7110240098066678	0.04582882659618643];
+        [total_time, total_q] = simulate(patient_param(i, 1:3), patient_t4(i, :), patient_t3(i, :), patient_tsh(i, :), dose(i), fitting_index, fitted_result);
         
         %some needed conversion factors
         T4max = max(total_q(:,1));
@@ -120,5 +122,5 @@ function plot_group_jonklaas()
     errorbar(patient_t,mean_tsh,tsh_std,'LineWidth',2.0,'Color',Color)
     
     %save plot and clear workspace
-    %saveas(myfig, ['./group_plots_new_ode/', name, '.png'])
+    saveas(myfig, ['./group_plots_new_ode_fitted/', name, '.png'])
 end
