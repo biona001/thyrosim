@@ -1,8 +1,8 @@
-function [total_time, total_q] = simulate(patient, T4_init, T3_init, Tsh_init, T3dose)
+function [total_time, total_q] = simulate(patient, T4data, T3data, TSHdata, T3dose)
     %patient = [1.831 94.7 1]; %height (m), weight(kg), and sex (male = 1)
-    %T4_init = 72;
-    %T3_init = 0.98;
-    %Tsh_init = 2.42;
+    T4_init = T4data(1);
+    T3_init = T3data(1);
+    Tsh_init = TSHdata(1);
     t_unit = 'hours'; %currently not used
     
     %simulation length
@@ -55,13 +55,30 @@ function [total_time, total_q] = simulate(patient, T4_init, T3_init, Tsh_init, T
     %}
     
     %simulate and plot
-    [total_time, total_q] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses);
+    [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses, [], []);
     
     %overlay real data with plotted values
     %plot_blakesley();
+    
+    %calculate error between simulation and data
+    idx = [1;2;3;5;7;9;11;13;15;17];
+    subsetted_t3 = return_t3(idx);
+    subsetted_t4 = return_t4(idx);
+    error = compute_error(T4data, T3data, subsetted_t4, subsetted_t3);
 end
     
-    
+function f = compute_error(T4data, T3data, T4sim, T3sim)
+    %{
+    if length(T4data) ~= length(T4sim)
+        error('T4 simulation vector and T4data vector not same length');
+    end
+    %}
+    if length(T3data) ~= length(T3sim)
+        error('T3 simulation vector and T3data vector not same length');
+    end
+    %return sum((T4data - T4sim).^2) + sum((T3data - T3sim).^2);
+    f = sum((T3data - T3sim).^2);
+end
     %{
     [a, b, c, d, t4_std, t3_std, tsh_std] = data_test2();
     f = 0.0;

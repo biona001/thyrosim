@@ -1,4 +1,4 @@
-function [p, d] = return_parameters(dial)
+function [p, d] = return_parameters(dial, fitting_index, current_iter)
     d(1) = dial(1);
     d(2) = dial(2);
     d(3) = dial(3);
@@ -60,4 +60,18 @@ function [p, d] = return_parameters(dial)
     p(50) = 3;              %K_SR_tsh
     p(51) = 7;              %hill exponent in f_circ
     p(52) = 5.2;            %hill exponent in SR_tsh
+    p(53) = 3.5;            %Km for f4
+    p(54) = 8.0;            %hill exponent for f4
+    
+    if ~isempty(fitting_index)
+        %check vector lengths match
+        if length(fitting_index) ~= length(current_iter)
+            error('check vector length bro');
+        end
+        
+        %change parameters for fitting
+        for i = 1:length(fitting_index)
+            p(fitting_index(i)) = current_iter(i);
+        end
+    end 
 end

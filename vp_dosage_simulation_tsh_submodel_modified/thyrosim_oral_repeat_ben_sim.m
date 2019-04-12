@@ -21,7 +21,7 @@
 %-------------------------------------------------- 
 
 % Main - wrapper for oral doses
-function [total_time, total_q] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses)
+function [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses,fitting_index,current_iter)
 
 % Initialize
 [ic,dial] = init(patient, T4_init, T3_init, Tsh_init);
@@ -43,7 +43,7 @@ total_q = [];
 for i=1:length(tspans)    
     ic = updateIC(ic,T4doses(i),T3doses(i)); % Add drugs, if any
     phase = mod(t_last, 24); 
-    [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspans(i,:),patient,phase); % Run simulation
+    [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspans(i,:),patient,phase,fitting_index,current_iter); % Run simulation
     ic = q(end,:); % Set this run's values as IC for next run
 
     % Graph results and update values for next run
@@ -76,7 +76,7 @@ end
 %graph(total_time,total_q);
 %graphFin(T4max,T3max,TSHmax);
 
-%[return_t4, return_t3, return_tsh] = t3_tsh_grabber(t,q, t4_values, t3_values, tsh_values);
+[return_t4, return_t3, return_tsh] = t3_tsh_grabber(t,q, t4_values, t3_values, tsh_values);
 end
 
 % Initialize initial conditions and dial values
@@ -91,7 +91,7 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
 
     % calling this function to get the p values to get correct initial
     % conditions in q2, q3, q5, q6
-    [p, d] = return_parameters(dial);
+    [p, d] = return_parameters(dial, [], []);
 
     %new initial conditions by solving quasi steady state
     q1 = T4_init*Vp_new/777;

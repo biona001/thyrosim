@@ -9,11 +9,11 @@
 %   All-Condition Thyroid Simulator Eqns 2015-06-29.pdf
 %-------------------------------------------------- 
 
-function [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspan,patient,phase)
+function [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspan,patient,phase,fitting_index,current_iter)
 
     % Initialize
     global u1 u4 kdelay d p;
-    [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase);
+    [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase,fitting_index,current_iter);
 
     % Solve ODE
     [t,q] = ode45(@ODEs, tspan, ic);
@@ -21,7 +21,7 @@ function [t,q] = thyrosim_core_ben_sim(ic,dial,inf1,inf4,tspan,patient,phase)
 end
 
 % Initialize parameter values
-function [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase)
+function [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase,fitting_index,current_iter)
 
     u1 = inf1;
     u4 = inf4;
@@ -32,7 +32,7 @@ function [u1,u4,kdelay,d,p] = initParams(inf1,inf4,dial,patient,phase)
     d(4) = dial(4);
 
     %obtain parameters for ode calculation
-    [p, d] = return_parameters(dial);
+    [p, d] = return_parameters(dial, fitting_index, current_iter);
 
     % some patient parameters W, H, sex
     [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(patient);
@@ -55,7 +55,8 @@ function dqdt = ODEs(t, q)
     SRTSH = (p(30)+p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)))*(p(50)^p(52)/(p(50)^p(52) + q(9)^p(52)));
     fdegTSH = p(34)+(p(35)*q(7)/(p(36)+q(7)));
     fLAG = p(41)+2*q(8)^11/(p(42)^11+q(8)^11);
-    f4 = p(37)+5*p(37)/(1+exp(2*q(8)-7));
+    %f4_old = p(37)+5*p(37)/(1+exp(2*q(8)-7));
+    f4 = p(37)*(1 + 5*(p(53)^p(54) / (p(53)^p(54)+q(8)^p(54))));
     NL = p(13)/(p(14)+q(2));
     
     % ODEs 
