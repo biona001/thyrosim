@@ -1,14 +1,7 @@
-function f = simulate()
-    patient = [1.7 70.0 0]; %height (m), weight(kg), and sex (male = 1)
-    T4_init = 70.0;
-    T3_init = 4.0;
-    Tsh_init = 2.42;
+function [total_time, total_q] = simulate(H, W, sex, T4_init, T3_init, Tsh_init, T4dose, days)
+    patient = [H, W, sex];
     t_unit = 'hours'; %currently not used
     
-    %simulation length
-    tspan = [0, 24]; %how often are doses given
-    repeat = 5;
-
     %get dosages based on various formulas
     addpath('../dosage_models')
     %T4dose = cunningham(patient(2), patient(3), 30); %weight, sex, age
@@ -17,29 +10,34 @@ function f = simulate()
     %T4dose = mistry(patient(2), 30); %weight, age
     %T4dose = donna(patient(1), patient(2), 30); %height, weight, age
     %T4dose = 0.257; %this is 200 micrograms of T4
-    %T4dose = 0.0;
-    %T3dose = 0.046; %0.046 = 30mcg 0.069 = 45mcg
+    %T3dose = 0.069; %0.046 = 30mcg 0.069 = 45mcg
     %T3dose = 0.0;
-    
+
     %construct simulation parameters
-    %{
+    tspan = [0, 24]; %how often are doses given
     tspans = [];
-    T4doses = [];
-    T3doses = [];
-    for i=1:repeat
+    T4doses = T4dose * ones(days, 1);
+    T3doses = zeros(days, 1);
+    for i=1:days
         tspans = [tspans; tspan];
-        T4doses = [T4doses; T4dose];
-        T3doses = [T3doses; T3dose];
     end
-    %}
-    T4_dose_blakesley = [0; 0.772; 0.0; 0.0; 0.0;]; %600 micrograms = 0.7722 micromoles
     
     %simulate and plot
-    [t4_values, t3_values, tsh_values] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses);
-    f = 0.0; %this calculates the error, need data
+    [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses, [], []);
 end
     
-    
+function f = compute_error(T4data, T3data, T4sim, T3sim)
+    %{
+    if length(T4data) ~= length(T4sim)
+        error('T4 simulation vector and T4data vector not same length');
+    end
+    %}
+    if length(T3data) ~= length(T3sim)
+        error('T3 simulation vector and T3data vector not same length');
+    end
+    %return sum((T4data - T4sim).^2) + sum((T3data - T3sim).^2);
+    f = sum((T3data - T3sim).^2);
+end
     %{
     [a, b, c, d, t4_std, t3_std, tsh_std] = data_test2();
     f = 0.0;
