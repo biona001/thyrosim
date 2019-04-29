@@ -21,24 +21,28 @@ function run()
     T4_dose_grams_upper = round(W(j) * upper_T4_per_kg / 12.5) * 12.5;
     possible_doses = T4_dose_grams_lower:12.5:T4_dose_grams_upper;
     doses_passing = true(length(possible_doses), 1);
-    disp(length(possible_doses));
     
     for i = 1:length(possible_doses)
         [total_time, total_q] = simulate(H(j), W(j), sex(j), T4_init, T3_init, Tsh_init(j), convert(possible_doses(i)), days(j));
         
         normal_range = [0.45; 4.5];
         simulated_tsh = total_q(total_time >= (days(j) - 1)*24, 7);
-        if any(simulated_tsh <= normal_range(1)) && any(simulated_tsh >= normal_range(2))
+        if any(simulated_tsh <= normal_range(1)) || any(simulated_tsh >= normal_range(2))
             doses_passing(i) = false;
+        else
+            %plot the reuslt and save to file
+            myfig = plot_simulation(total_time, total_q, patient_param);
         end
-        
-        %plot the reuslt
-        plot_simulation(total_time, total_q, patient_param)
     end
     
-    %see how many doses are successfully enthyroiding the patient.
-    disp(possible_doses(doses_passing));
+    %save plot
+    saveas(myfig, ['./plots_and_doses/', num2str(j), '.png']);
+    clf('reset');
     
+    %save doses that successfully enthyroiding the patient
+    fileID = fopen(['./plots_and_doses/', num2str(j), '.txt'], 'w');
+    fprintf(fileID,'%f\n',possible_doses(doses_passing));
+    %disp(possible_doses(doses_passing));
 end
 
 function T4_micromols = convert(T4dose)

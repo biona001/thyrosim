@@ -1,4 +1,4 @@
-function plot_simulation(total_time, total_q, patient_param)
+function myfig = plot_simulation(total_time, total_q, patient_param)
 
     %some needed conversion factors
     T4max = max(total_q(:,1));
