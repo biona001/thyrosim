@@ -57,10 +57,10 @@ function myfig = plot_simulation(total_time, total_q, patient_param)
     ylabel('TSH mU/L');
     ylim([0 p3max]);
     xlabel('Days');
-    hline = refline(0,0.4); %slope, intercept
-    hline2 = refline(0,4.0); %slope, intercept
-    hline.Color='g';
-    hline2.Color='g';
+    hline = refline(0,0.45); %slope, intercept
+    hline2 = refline(0,4.5); %slope, intercept
+    hline.Color='r';
+    hline2.Color='r';
     set(gca,'fontsize',18)
 
     %save plot and clear workspace
