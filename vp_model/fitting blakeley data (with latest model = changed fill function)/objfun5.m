@@ -1,5 +1,5 @@
 function f = objfun5(current_iter)
-    fitting_index = [31];
+    fitting_index = [30 31 50 52];
     
     if length(fitting_index) ~= length(current_iter)
         error('check vector length bro');
@@ -13,25 +13,27 @@ function f = objfun5(current_iter)
     num_sim = length(time)-1;
     tspans = zeros(num_sim,2);
     for i=1:num_sim
-        %tspans(i, :) = [0 time(i+1)-time(i)]; %(e.g. [0, 24; 0, 24])
-        tspans(i, :) = [0 24];
+        tspans(i, :) = [0 time(i+1)-time(i)]; %(e.g. [0, 24; 0, 24])
+        %tspans(i, :) = [0 24];
     end
         
     %patient parameters = height (m), weight(kg), and sex (male = 1)
-    patient_param = [1.77 70.0 1]; %NEED THIS TO CHANGE TO 1.77M
+    patient_param = [1.77 70.0 1]; 
     
     %initialize residual sum of squares
     f = 0.0;
     
     %loop through the 3 datasets we have
     for i=1:3
+    %i = 1;    
         cur_data = blakesley_data(:,:,i);        
         initial_condition = [cur_data(1,1); cur_data(1,2); cur_data(1,3)]; %T4/T3/TSH 
-
+        %disp(initial_condition);
+        
         %T4 drug dosage at beginning of 2nd day (16th time point)
         T4doses = zeros(num_sim,1);
         T3doses = zeros(num_sim,1);
-        %T4doses(16) = doses(i);
+        T4doses(16) = doses(i);
         %T4doses = 0.193*ones(num_sim,1);
 
         if length(T4doses) ~= length(tspans)
@@ -45,8 +47,8 @@ function f = objfun5(current_iter)
         r1 = cur_data(:,1) - t4_values;
         r2 = cur_data(:,2) - t3_values;
         r3 = cur_data(:,3) - tsh_values;
-        f = f + dot(r1, r1)/10000; %scale T4 data down to approxiate range
-        f = f + dot(r2, r2);
+        %f = f + dot(r1, r1)/10000; %scale T4 data down to approxiate range
+        %f = f + dot(r2, r2);
         f = f + dot(r3, r3);
 
         %overlay real data with simulated values
@@ -70,9 +72,8 @@ end
 
 
 
-% fitting only TSH -> no Amax
-%init = [581/10 2.0 4.0 4.0]
-%lower = [0 0 0 0]
-%upper = [1000 10 10 10]
-
-%result = [47.60971491706481	4.109957293739052	9.402862407833984	9.34704376566979]
+% fitting with t4, t3, TSH 
+%init = [100.0 1.0 3.0 5.2]
+%upper = [1000 10 30 52]
+%lower = [10 0.1 0.3 0.52]
+%result = [100.19790363585261	0.42603631376491713	3.9215509547537653	7.7385187605186765]

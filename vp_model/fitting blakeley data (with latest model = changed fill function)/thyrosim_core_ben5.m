@@ -56,11 +56,14 @@ function dqdt = ODEs(t, q)
     q1F = (p(7) +p(8) *q(1)+p(9) *q(1)^2+p(10)*q(1)^3)*q(1);        %FT4p
     SR3 = (p(19)*q(19))*d(3);                                       % Brain delay
     SR4 = (p(1) *q(19))*d(1);                                       % Brain delay
-    fCIRC = (p(32)+(p(31)-p(32))*q(9)^p(51)/(q(9)^p(51)+p(49)^p(51)))/p(31);
-    SRTSH = (p(30)+p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)))*(p(50)^p(52)/(p(50)^p(52) + q(9)^p(52)));
+    %fCIRC = (p(32)+(p(31)-p(32))*q(9)^p(51)/(q(9)^p(51)+p(49)^p(51)))/p(31);
+    %SRTSH = (p(30)+p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)))*(p(50)^p(52)/(p(50)^p(52) + q(9)^p(52)));
+    fCIRC = 1.0;
+    SRTSH = (p(30)*(p(50)^p(52)/(p(50)^p(52) + q(9)^p(52))) + p(31)*fCIRC*sin(pi/12*(t+p(60))-p(33)));
     fdegTSH = p(34)+(p(35)*q(7)/(p(36)+q(7)));
     fLAG = p(41)+2*q(8)^11/(p(42)^11+q(8)^11);
-    f4 = p(37)+5*p(37)/(1+exp(2*q(8)-7));
+    %f4_old = p(37)+5*p(37)/(1+exp(2*q(8)-7));
+    f4 = p(37)*(1 + 5*(p(53)^p(54) / (p(53)^p(54)+q(8)^p(54))));
     NL = p(13)/(p(14)+q(2));
     
     % ODEs 
@@ -78,6 +81,7 @@ function dqdt = ODEs(t, q)
     qdot(11)=  p(43)*q(10)-(p(44)+p(11))*q(11);                             %T4GUTdot
     qdot(12)= -p(45)*q(12);                                                 %T3PILLdot
     qdot(13)=  p(45)*q(12)-(p(46)+p(28))*q(13);                             %T3GUTdot
+
 
     % Delay ODEs
     qdot(14)= -kdelay*q(14) +q(7);                                          %delay1

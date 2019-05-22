@@ -85,7 +85,8 @@ function [display_t4,display_t3,display_tsh] = thyrosim_oral_repeat_ben5(fitting
             TSHmax = max(q(:,7));
         end
     end
-    disp(total_q(:, 4) ./ total_q(:, 8));
+    %disp(total_q(:, 4) ./ total_q(:, 8));
+    %disp(total_q(:, 8));
     graph(total_time,total_q);
     graphFin(T4max,T3max,TSHmax);
 
@@ -100,7 +101,9 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     [Vp_new, Vtsh_new, Vp_ratio] = patientParam5(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
 
     % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
-    dial = [0.1, 0.88, 0.1, 0.88];
+    %dial = [1.0, 0.88, 1.0, 0.88]; %normal patient
+    dial = [1, 0.88, 1, 0.88]; %mild hypothyroid
+    %dial = [0.005, 0.88, 0.005, 0.88]; %severe hypothyroid
 
     % calling this function to get the p values to get correct initial
     % conditions in q2, q3, q5, q6
@@ -112,16 +115,29 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     q7 = Tsh_init*Vtsh_new/5.6;
     FT3p = (p(24)+p(25)*q1+p(26)*q1^2+p(27)*q1^3)*q4;
     FT4p = (p(7)+p(8)*q1+p(9)*q1^2+p(10)*q1^3)*q1;
+    a_bd_c = p(6)*FT4p - (p(3)+p(12))*p(14) - p(13);
+    
+    %AA = p(4);
+    %BB = -p(5)*FT4p+p(4)*(p(16)+p(18))+p(15)+p(17);
+    %CC = -p(5)*FT4p*(p(16)+p(18))+p(4)*p(16)*p(18)+p(15)*p(18)+p(17)*p(16);
+    %DD = -p(5)*FT4p*p(16)*p(18);
+    %result = roots([AA BB CC DD]);
+    %q3 = result(result >= 0); %hope that this is just a single value for all cases
 
     ic(1) = q1;
-    ic(2) = (p(6)*FT4p) / (p(3)+p(12)+(p(13)/p(14))); 
+    %ic(2) = (p(6)*FT4p) / (p(3)+p(12)+(p(13)/p(14))); %assuming Km21fast much greater than q2 in the denominator -> potentially bad approximation
+    ic(2) = (a_bd_c + sqrt(a_bd_c^2 + 4*(p(3)+p(12))*p(6)*FT4p*p(14))) / (2*(p(3)+p(12)));
     ic(3) = (p(5)*FT4p - p(17)) / (p(4) + (p(15)/p(16)));
+    %ic(3) = q3;
     ic(4) = q4;
     ic(5) = (p(23)*FT3p + (p(13)*ic(2))/(p(14)+ic(2))) / (p(20)+p(29));
     ic(6) = (p(22)*FT3p + (p(15)*ic(3))/(p(16)+ic(3)) + (p(17)*ic(3))/(p(18)+ic(3))) / (p(21));
     ic(7) = q7;
     ic(8) = 7.05727560072869;
     ic(9) = 7.05714474742141;
+    %ic(8) = (p(37)*q1/p(38) + p(37)*q4/p(39)) / p(40); %IMPORTANT: this assumes T3B is very high, so f4 ~ k3 probably need to change for Jonklaas data
+    %ic(9) = ic(8);
+    %disp(ic(8));
     ic(10) = 0;
     ic(11) = 0;
     ic(12) = 0;
@@ -132,6 +148,10 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     ic(17) = 3.90061903207543;
     ic(18) = 3.77875734283571;
     ic(19) = 3.55364471589659;
+    
+    %disp((p(19)*ic(19))*d(3)); %SR3
+    %disp(p(20)*ic(5));
+    %disp(p(21)*ic(6));
     
     %initial condition from original thyrosim
     %{
