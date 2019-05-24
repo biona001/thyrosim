@@ -1,5 +1,5 @@
 function f = objfun5(current_iter)
-    fitting_index = [30 31 50 52];
+    fitting_index = [30 31 49 50 51 52];
     
     if length(fitting_index) ~= length(current_iter)
         error('check vector length bro');
@@ -47,8 +47,8 @@ function f = objfun5(current_iter)
         r1 = cur_data(:,1) - t4_values;
         r2 = cur_data(:,2) - t3_values;
         r3 = cur_data(:,3) - tsh_values;
-        %f = f + dot(r1, r1)/10000; %scale T4 data down to approxiate range
-        %f = f + dot(r2, r2);
+        f = f + dot(r1, r1)/10000; %scale T4 data down to approxiate range
+        f = f + dot(r2, r2);
         f = f + dot(r3, r3);
 
         %overlay real data with simulated values
@@ -73,7 +73,7 @@ end
 
 
 % fitting with t4, t3, TSH 
-%init = [100.0 1.0 3.0 5.2]
-%upper = [1000 10 30 52]
-%lower = [10 0.1 0.3 0.52]
-%result = [100.19790363585261	0.42603631376491713	3.9215509547537653	7.7385187605186765]
+%init = [100.0 49.39 4.0 3.0 7.0 5.2]
+%upper = [1000.0 493.9 40.0 30.0 70.0 52.0]
+%lower = [10.0 4.939 0.4 0.3 0.7 0.52]
+%result = [100.98899964336827	47.64447847034241	4.574319275722421 3.902060329741689	6.90649038160358	7.656719244520238]

@@ -89,6 +89,7 @@ function [display_t4,display_t3,display_tsh] = thyrosim_oral_repeat_ben5(fitting
     %disp(total_q(:, 8));
     graph(total_time,total_q);
     graphFin(T4max,T3max,TSHmax);
+    %disp(total_q(end, 9)) %T3brain lag
 
     %convert to appropriate units and return
     [display_t4, display_t3, display_tsh] = convert(return_t4_values, return_t3_values, return_tsh_values);
@@ -101,8 +102,7 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     [Vp_new, Vtsh_new, Vp_ratio] = patientParam5(patient, 3.2, 5.2); %just used to calculated initial conditions, so use original Vp and Vtsh
 
     % [T4 Secretion, T4 Absorption, T3 Secretion, T3 Absorption]
-    %dial = [1.0, 0.88, 1.0, 0.88]; %normal patient
-    dial = [1, 0.88, 1, 0.88]; %mild hypothyroid
+    dial = [1.0, 0.88, 1.0, 0.88]; %normal patient
     %dial = [0.005, 0.88, 0.005, 0.88]; %severe hypothyroid
 
     % calling this function to get the p values to get correct initial
@@ -137,7 +137,6 @@ function [ic,dial] = init(patient, T4_init, T3_init, Tsh_init)
     ic(9) = 7.05714474742141;
     %ic(8) = (p(37)*q1/p(38) + p(37)*q4/p(39)) / p(40); %IMPORTANT: this assumes T3B is very high, so f4 ~ k3 probably need to change for Jonklaas data
     %ic(9) = ic(8);
-    %disp(ic(8));
     ic(10) = 0;
     ic(11) = 0;
     ic(12) = 0;
