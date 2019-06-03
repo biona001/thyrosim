@@ -51,6 +51,7 @@ return_tsh_values(1) = Tsh_init;
 % Run simulation for each defined run
 total_time = [];
 total_q = [];
+
 for i=1:length(tspans)    
     ic = updateIC(ic,T4doses(i),T3doses(i)); % Add drugs, if any
     phase = mod(t_last, 24); 

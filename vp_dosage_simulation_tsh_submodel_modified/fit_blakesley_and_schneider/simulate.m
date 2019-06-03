@@ -23,7 +23,7 @@ function [total_time, total_q] = simulate(H, W, sex, T4_init, T3_init, Tsh_init,
     end
     
     %simulate and plot
-    [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses, current_iter, fitting_index, thyrosim_version, dial);
+    [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses, fitting_index, current_iter, thyrosim_version, dial);
 end
     
 function f = compute_error(T4data, T3data, T4sim, T3sim)
