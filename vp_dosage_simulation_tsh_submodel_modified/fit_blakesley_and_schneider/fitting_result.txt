@@ -1,1 +1,1 @@
-Ran for too long!!! error was 1.9333
+Converged. Check log file for final error.

@@ -119,6 +119,9 @@ function f1 = compute_schneider_error(current_iter, fitting_index, schneider_dat
     end
     
     %now compute error
+    disp(sum(euthyroid_dose_passes));
+    disp(sum(initial_dose_passes(~initial_dose_is_correct)));
+    disp(sum(~initial_dose_is_correct));
     f1 = f1 + 1 - (sum(euthyroid_dose_passes) / size(schneider_data, 1));
     f1 = f1 + sum(initial_dose_passes(~initial_dose_is_correct)) / sum(~initial_dose_is_correct);
     
