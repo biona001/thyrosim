@@ -6,9 +6,13 @@ function plot_individual_patients_jonklaas()
         
     for i=1:size(patient_t4, 1)
         %simulate using thyrosim
-        fitting_index = [28 45 46];
-        fitted_result = [0.46559884538558116	1.7110240098066678	0.04582882659618643];
-        [total_time, total_q] = simulate(patient_param(i, 1:3), patient_t4(i, :), patient_t3(i, :), patient_tsh(i, :), dose(i), fitting_index, fitted_result);
+        fitting_index = [28 45];
+        fitted_result = [0.4978095968226612	1.8774027646837803];
+        %fitting_index = [];
+        current_iter = [];
+        patient = patient_param(i, 1:3);
+        %patient = [70 1.7 1];
+        [total_time, total_q] = simulate(patient, patient_t4(i, :), patient_t3(i, :), patient_tsh(i, :), dose(i), fitting_index, fitted_result);
 
         %some needed conversion factors
         T4max = max(total_q(:,1));
@@ -77,7 +81,7 @@ function plot_individual_patients_jonklaas()
         
         %save plot and clear workspace
         %savefig(['./individual_plots/', num2str(i), '.fig'])
-        saveas(myfig, ['./individual_plots_new_ode_fitted/', num2str(i), '.png'])
+        saveas(myfig, ['./worspace/', num2str(i), '_2param.png'])
         clf('reset');
     end 
 end

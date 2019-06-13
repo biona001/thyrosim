@@ -1,6 +1,6 @@
 function f = fitting(current_iter)
     %specify the variables we want fitted
-    fitting_index = [28 45 46];
+    fitting_index = [28 45];
 
     %loop over all patients
     [patient_param, patient_t4, patient_t3, patient_tsh, t4_std, t3_std, tsh_std] = data_test2();
@@ -35,7 +35,7 @@ function f = fitting(current_iter)
 
         %simulate 
         [total_time, total_q, return_t4, return_t3, return_tsh] = thyrosim_oral_repeat_ben_sim(patient, T4_init, T3_init, Tsh_init, t_unit, tspans, T4doses, T3doses,fitting_index,current_iter);
-        create_plot(total_time, total_q, patient, T4data, T3data, TSHdata)
+        create_plot(total_time, total_q, patient, T4data, T3data, TSHdata);
         
         %calculate error between simulation and data
         idx = [1;2;3;5;7;9;11;13;15;17];
@@ -132,7 +132,12 @@ function create_plot(total_time, total_q, patient, T4data, T3data, TSHdata)
 end
 
 %original = [0.88 1.78 0.1056];
-%current_iter = [8.8 17.8 1.056];
 %lower = [0 0 0];
 %upper = [10 10 10];
 %result = [0.46559884538558116	1.7110240098066678	0.04582882659618643];
+
+
+%original = [0.88 1.78];
+%lower = [0 0];
+%upper = [10 10];
+%result = [0.4978095968226612	1.8774027646837803]

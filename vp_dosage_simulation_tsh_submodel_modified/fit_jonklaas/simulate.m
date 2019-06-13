@@ -30,6 +30,7 @@ function [total_time, total_q] = simulate(patient, T4data, T3data, TSHdata, T3do
     end
     %T4doses(2) = 0.7722;
     T3doses(1) = T3dose;
+    %T3doses(:) = 0.069;
         
     %read blakesley data for parameter fitting
     %{
