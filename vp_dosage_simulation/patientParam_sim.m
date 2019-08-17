@@ -17,13 +17,20 @@ function [Vp_new, Vtsh_new, Vp_ratio] = patientParam_sim(input)
     end
     
     %sums of exponential (fitted from feldschuh's data)
+%     Div = (W - IW) / IW * 100; %deviation from ideal weight
+%     a = 30.19;
+%     b = -0.01744;
+%     c = 39.47;
+%     d = 0.0006516;
+%     Vb_per_kg = a*exp(b*Div) + c*exp(d*Div);
+
+    % hill function fitted to feldchush data
     Div = (W - IW) / IW * 100; %deviation from ideal weight
-    a = 30.19;
-    b = -0.01744;
-    c = 39.47;
-    d = 0.0006516;
-    Vb_per_kg = a*exp(b*Div) + c*exp(d*Div);
-    Vb = Vb_per_kg * W / 1000; 
+    a = 1.42634 * 10^4;
+    n = 0.745964264;
+    K = 100.0;
+    Vb_per_kg = a * (100.0 + Div)^(n - 1) / ((100 + Div)^n + K^n);
+    Vb = Vb_per_kg * W / 1000;
     
     %average male/female data in US
     male_ref_vp = 2.92;

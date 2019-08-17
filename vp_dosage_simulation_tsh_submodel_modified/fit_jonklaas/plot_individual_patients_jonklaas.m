@@ -81,7 +81,7 @@ function plot_individual_patients_jonklaas()
         
         %save plot and clear workspace
         %savefig(['./individual_plots/', num2str(i), '.fig'])
-        saveas(myfig, ['./worspace/', num2str(i), '_2param.png'])
+        saveas(myfig, ['./workspace/', num2str(i), '_2param.png'])
         clf('reset');
     end 
 end
